@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OnMissionChoiceInf : MonoBehaviour
 {
     public Animator MissionSelector;
+    public Sprite InfIcon;
+    public GameObject LocationLock;
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -24,6 +26,10 @@ public class OnMissionChoiceInf : MonoBehaviour
             {
                 MissionSelector.SetBool("closing", true);
                 GameManagerScript.Instance.EmptyMailbox();
+                LocationLock.GetComponent<Image>().sprite = InfIcon;
+                GameManagerScript.Instance.ReduceInfluence(GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission].InfReward);
+                LocationLock.GetComponent<WorldLocations>().WorldState += 1;
+                GameManagerScript.Instance.CurrentCountry = "USA";
             }
         }
         else

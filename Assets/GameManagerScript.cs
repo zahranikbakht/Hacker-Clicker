@@ -96,21 +96,21 @@ public class GameManagerScript : MonoBehaviour
         UpgradeNumber.Add("ubertooth", 0);
 
         UpgradePower.Add("CPU", 2);
-        UpgradePower.Add("ssd", 5);
-        UpgradePower.Add("power", 10);
-        UpgradePower.Add("ubertooth", 20);
+        UpgradePower.Add("ssd", 3);
+        UpgradePower.Add("power", 4);
+        UpgradePower.Add("ubertooth", 5);
 
         DarkWebPower.Add("Bitcoin", 1);
-        DarkWebPower.Add("Firearm", 2);
-        DarkWebPower.Add("Spy", 5);
+        DarkWebPower.Add("Firearm", 5);
+        DarkWebPower.Add("Spy", 20);
 
         DarkWebNumber.Add("Bitcoin", 0);
         DarkWebNumber.Add("Firearm", 0);
         DarkWebNumber.Add("Spy", 0);
 
         GovPower.Add("Survillance", 1);
-        GovPower.Add("Assistant", 2);
-        GovPower.Add("Private Jet", 5);
+        GovPower.Add("Assistant", 5);
+        GovPower.Add("Private Jet", 20);
 
         GovNumber.Add("Survillance", 0);
         GovNumber.Add("Assistant", 0);
@@ -124,7 +124,7 @@ public class GameManagerScript : MonoBehaviour
                                     "Canada", 
                                     500, 
                                     500, 
-                                    1);
+                                    500);
 
         CanadaMissions[1] = new Mission("Canada's electrity sector has recently been the target of many cyberattacks. You have found a loophole that lets you disrupt the supply of electricity throughout the country.",
                                     "BULK POWER SYSTEM",
@@ -133,7 +133,7 @@ public class GameManagerScript : MonoBehaviour
                                     "Canada",
                                     2000,
                                     2000,
-                                    1);
+                                    2000);
         CanadaMissions[2] = new Mission("You have been informed that there is a high chance Minister of Foreign Affairs is involved with several criminal offenses. You decide to break into his personal computer to get solid proof.",
                             "Expose Scandal",
                             "- Assist the government to cover his corruption.",
@@ -141,7 +141,7 @@ public class GameManagerScript : MonoBehaviour
                             "Canada",
                             9000,
                             9000,
-                            1);
+                            9000);
         CanadaMissions[3] = new Mission("You have hijacked thousands of devices across the country to provide enough computing power for a Brute Force Attack against The Bank of Canada. This will allow you to 'guess' passwords and get unauthorized access to their data.",
                             "Brute Force",
                             "- Contact the Governing Council and offer security advice.",
@@ -149,7 +149,7 @@ public class GameManagerScript : MonoBehaviour
                             "Canada",
                             40000,
                             40000,
-                            1);
+                            40000);
 
         CanadaMissions[4] = new Mission("You have established a vast network in Canada. Now you have enough power to determine the fate of this country.",
                     "Brute Force",
@@ -191,11 +191,11 @@ public class GameManagerScript : MonoBehaviour
 
         //Mission Buffer
 
-        if (!Notification.activeSelf && MissionName.text == "NO ACTIVE MISSION")
+        if (!Notification.activeSelf && MissionName.text == "NO ACTIVE MISSION" && CurrentCountry != "USA")
         {
             if (MissionBuffer <= 0)
             {
-                MissionBuffer = Random.Range(1, 2);
+                MissionBuffer = Random.Range(30, 90);
             }
             else
             {

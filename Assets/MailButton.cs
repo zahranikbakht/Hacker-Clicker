@@ -13,6 +13,10 @@ public class MailButton : MonoBehaviour
     public Text DataCost;
     public Text InfluenceCost;
     public Text ReputationCost;
+    public GameObject RepLock;
+    public GameObject InfLock;
+    public Button RepButton;
+    public Button InfButton;
 
     public Animator MissionSelector;
     // Start is called before the first frame update
@@ -57,6 +61,10 @@ public class MailButton : MonoBehaviour
         DataCost.text = "Earn " + CurrentMission.Cost.ToString() + " DATA to complete";
         InfluenceCost.text = "LOSS: " + CurrentMission.CostPercent.ToString()+"% OF INFLUENCE";
         ReputationCost.text =  "LOSS: " + CurrentMission.CostPercent.ToString() + "% OF Reputation";
+        RepLock.SetActive(false);
+        InfLock.SetActive(false);
+        RepButton.interactable = true;
+        InfButton.interactable = true;
     }
 
     public void CreateFinale()
@@ -68,7 +76,17 @@ public class MailButton : MonoBehaviour
         Influence_Choice.text = CurrentMission.InfChoice;
         Influece_Reward.text = "COST: " + CurrentMission.InfReward.ToString() + " Inf";
         Reputation_Reward.text = "COST: " + CurrentMission.RepReward.ToString() + " Rep";
+        if (GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission].RepReward > GameManagerScript.Instance.CurrentReputation)
+        {
+            RepLock.SetActive(true);
+            RepButton.interactable = false;
+        }
 
+        if (GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission].InfReward > GameManagerScript.Instance.CurrentInfluence)
+        {
+            InfLock.SetActive(true);
+            InfButton.interactable = false;
+        }
         DataCost.text = "";
         InfluenceCost.text = "";
         ReputationCost.text = "";
