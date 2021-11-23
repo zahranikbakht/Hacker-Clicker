@@ -3,28 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Numerics;
 
 public class ClickHelper : MonoBehaviour
 {
-    public long InitialCost = 0;
-    public long NumClicked = 0;
+    public int InitialCost = 0;
+    public BigInteger NumClicked = 0;
     public float Multiplier = 1.5f;
     public GameObject CostLabel;
     public GameObject DisabledShade;
     public GameObject Flash;
     TextMeshProUGUI CostText;
-    long CurrentCost = 0;
+    public BigInteger CurrentCost = 0;
     Button ButtonComponent;
     string ItemName;
     public TextMeshProUGUI AnnouncementText;
+    public TextMeshProUGUI Amount;
+    AudioSource sound;
+    public AudioClip clip1;
     // Start is called before the first frame update
     void Start()
     {
+        sound = this.GetComponent<AudioSource>();
         CostText = CostLabel.GetComponent<TextMeshProUGUI>();
         ButtonComponent = this.GetComponent<Button>();
         CurrentCost = InitialCost;
         ItemName = this.gameObject.name;
-        CostText.text = (InitialCost).ToString() + " Data";
+        Load();
+        CostText.text = GameManagerScript.BigIntegerDisplay(CurrentCost) + " Data";
+        Amount.text = GameManagerScript.BigIntegerDisplay(NumClicked);
     }
 
     // Update is called once per frame
@@ -50,20 +57,40 @@ public class ClickHelper : MonoBehaviour
     {
         if (GameManagerScript.Instance.CurrentData >= CurrentCost)
         {
+            sound.PlayOneShot(clip1);
             GameManagerScript.Instance.ReduceData(CurrentCost);
             GameManagerScript.Instance.UpgradeNumber[ItemName] += 1;
             this.NumClicked += 1;
-            CurrentCost = (int)(CurrentCost * Multiplier);
-            CostText.text = (CurrentCost).ToString() + " Data";
+            CurrentCost = new BigInteger((double)CurrentCost * Multiplier);
+            CostText.text = GameManagerScript.BigIntegerDisplay(CurrentCost) + " Data";
+            Amount.text = GameManagerScript.BigIntegerDisplay(NumClicked);
         }
     }
 
     public void TaskOnHover()
     {
-        AnnouncementText.text = "Earn " + GameManagerScript.Instance.UpgradePower[ItemName].ToString() + "x more data per click with this upgrade.";
+        AnnouncementText.text = "Earn " + GameManagerScript.BigIntegerDisplay(GameManagerScript.Instance.UpgradePower[ItemName]) + " more data per click with this upgrade.";
     }
     public void TaskOnExitHover()
     {
         AnnouncementText.text = "";
+    }
+
+    public void Load()
+    {
+        string loaded;
+        loaded = PlayerPrefs.GetString(this.gameObject.name + "Cost","N/A");
+        if (loaded.Equals("N/A"))
+            return;
+        if (BigInteger.Parse(loaded) == 0)
+        {
+            this.CurrentCost = InitialCost;
+        }
+        else
+        {
+            this.CurrentCost = BigInteger.Parse(loaded);
+        }
+        loaded = PlayerPrefs.GetString(this.gameObject.name);
+        this.NumClicked = BigInteger.Parse(loaded.Split(',')[0]);
     }
 }

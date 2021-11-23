@@ -3,38 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Numerics;
+
 public class RepMakerClick : MonoBehaviour
 {
-    public long InitialCost = 0;
-    public long InitialRepCost = 0;
-    public long NumClicked = 0;
-    public float Multiplier = 1.5f;
+    public int InitialCost;
+    public int InitialRepCost;
+    public BigInteger NumClicked = 0;
+    public double Multiplier = 1.5f;
     public GameObject CostLabel;
     public GameObject DisabledShade;
     public GameObject Flash;
     TextMeshProUGUI CostText;
     public TextMeshProUGUI RepCostText;
-    long CurrentCost = 0;
-    long CurrentRepCost = 0;
+    public BigInteger CurrentCost;
+    public BigInteger CurrentRepCost;
     Button ButtonComponent;
     string ItemName;
     public TextMeshProUGUI AnnouncementText;
+    public TextMeshProUGUI Amount;
+    AudioSource sound;
+    public AudioClip clip1;
     // Start is called before the first frame update
     void Start()
     {
+        sound = this.GetComponent<AudioSource>();
         CostText = CostLabel.GetComponent<TextMeshProUGUI>();
         ButtonComponent = this.GetComponent<Button>();
         CurrentCost = InitialCost;
         CurrentRepCost = InitialRepCost;
         ItemName = this.gameObject.name;
-        CostText.text = (InitialCost).ToString() + " Data";
-        RepCostText.text = (InitialRepCost).ToString() + " REP";
+        Load();
+        CostText.text = GameManagerScript.BigIntegerDisplay(CurrentCost) + " Data";
+        RepCostText.text = GameManagerScript.BigIntegerDisplay(CurrentRepCost) + " REP";
+        Amount.text = GameManagerScript.BigIntegerDisplay(NumClicked);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (GameManagerScript.Instance.CurrentData >= CurrentCost && GameManagerScript.Instance.CurrentInfluence >= CurrentRepCost)
+        if (GameManagerScript.Instance.CurrentData >= CurrentCost && GameManagerScript.Instance.CurrentReputation >= CurrentRepCost)
         {
             //enable the button
             ButtonComponent.interactable = true;
@@ -52,26 +60,54 @@ public class RepMakerClick : MonoBehaviour
     }
     public void TaskOnClick()
     {
-        if (GameManagerScript.Instance.CurrentData >= CurrentCost && GameManagerScript.Instance.CurrentInfluence >= CurrentRepCost)
+        if (GameManagerScript.Instance.CurrentData >= CurrentCost && GameManagerScript.Instance.CurrentReputation >= CurrentRepCost)
         {
+            sound.PlayOneShot(clip1);
             GameManagerScript.Instance.ReduceData(CurrentCost);
             this.NumClicked += 1;
-            CurrentCost = (int)(CurrentCost * Multiplier);
-            CostText.text = (CurrentCost).ToString() + " Data";
+            CurrentCost = new BigInteger((((double)CurrentCost) * (Multiplier)));
+            CostText.text = GameManagerScript.BigIntegerDisplay(CurrentCost) + " Data";
 
             GameManagerScript.Instance.ReduceReputation(CurrentRepCost);
             GameManagerScript.Instance.GovNumber[ItemName] += 1;
-            CurrentRepCost = (int)(CurrentRepCost * (Multiplier));
-            RepCostText.text = (CurrentRepCost).ToString() + " Rep";
+            CurrentRepCost = new BigInteger(((double)CurrentRepCost * (Multiplier)));
+            RepCostText.text = GameManagerScript.BigIntegerDisplay(CurrentRepCost) + " Rep";
+            Amount.text = GameManagerScript.BigIntegerDisplay(NumClicked);
         }
     }
 
     public void TaskOnHover()
     {
-        AnnouncementText.text = "1 "+ ItemName + " obtains "+ GameManagerScript.Instance.GovPower[ItemName].ToString() + " reputation every 3 seconds.";
+        AnnouncementText.text = "1 "+ ItemName + " obtains "+ GameManagerScript.BigIntegerDisplay(GameManagerScript.Instance.GovPower[ItemName]) + " reputation every 2 seconds.";
     }
     public void TaskOnExitHover()
     {
         AnnouncementText.text = "";
+    }
+    public void Load()
+    {
+        string loaded;
+        loaded = PlayerPrefs.GetString(this.gameObject.name + "DataCost", "N/A");
+        if (loaded.Equals("N/A"))
+            return;
+        if (BigInteger.Parse(loaded) == 0)
+        {
+            this.CurrentCost = InitialCost;
+        }
+        else
+        {
+            this.CurrentCost = BigInteger.Parse(loaded);
+        }
+        loaded = PlayerPrefs.GetString(this.gameObject.name + "RepCost");
+        if (BigInteger.Parse(loaded) == 0)
+        {
+            this.CurrentRepCost = InitialRepCost;
+        }
+        else
+        {
+            this.CurrentRepCost = BigInteger.Parse(loaded);
+        }
+        loaded = PlayerPrefs.GetString(this.gameObject.name);
+        this.NumClicked = BigInteger.Parse(loaded.Split(',')[0]);
     }
 }

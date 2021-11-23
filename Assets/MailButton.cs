@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MailButton : MonoBehaviour
@@ -19,10 +20,13 @@ public class MailButton : MonoBehaviour
     public Button InfButton;
 
     public Animator MissionSelector;
+    public TextMeshProUGUI AnnouncementText;
+    AudioSource sound;
+    public AudioClip clip1;
     // Start is called before the first frame update
     void Start()
     {
-        
+        sound = this.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -49,16 +53,34 @@ public class MailButton : MonoBehaviour
         }
     }
 
+    public void TaskOnHover()
+    {
+        sound.PlayOneShot(clip1);
+        if (GameManagerScript.Instance.NewMissionInMailBox == true)
+        {
+            AnnouncementText.text = "You have 1 new message!";
+        }
+        else
+        {
+            AnnouncementText.text = "You have no new messages.";
+        }
+    }
+    public void OnHoverExit()
+    {
+        AnnouncementText.text = "";
+    }
+
     public void CreateMission()
     {
-        Mission CurrentMission = GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission];
+        string country = GameManagerScript.Instance.Countries[GameManagerScript.Instance.CurrentCountry];
+        Mission CurrentMission = GameManagerScript.Instance.Missions[country][GameManagerScript.Instance.CurrentMission];
         Name.text = "Mission " + (GameManagerScript.Instance.CurrentMission + 1).ToString() + "/4:" + CurrentMission.Name;
         Description.text = CurrentMission.Description;
         Reputation_Choice.text = CurrentMission.RepChoice;
         Influence_Choice.text = CurrentMission.InfChoice;
-        Influece_Reward.text = "REWARD: " + CurrentMission.InfReward.ToString();
-        Reputation_Reward.text = "REWARD: " + CurrentMission.RepReward.ToString();
-        DataCost.text = "Earn " + CurrentMission.Cost.ToString() + " DATA to complete";
+        Influece_Reward.text = "REWARD: " + GameManagerScript.BigIntegerDisplay(CurrentMission.InfReward) + " Influence";
+        Reputation_Reward.text = "REWARD: " + GameManagerScript.BigIntegerDisplay(CurrentMission.RepReward) + " Reputation";
+        DataCost.text = "Earn " + GameManagerScript.BigIntegerDisplay(CurrentMission.Cost) + " DATA to complete";
         InfluenceCost.text = "LOSS: " + CurrentMission.CostPercent.ToString()+"% OF INFLUENCE";
         ReputationCost.text =  "LOSS: " + CurrentMission.CostPercent.ToString() + "% OF Reputation";
         RepLock.SetActive(false);
@@ -69,23 +91,33 @@ public class MailButton : MonoBehaviour
 
     public void CreateFinale()
     {
-        Mission CurrentMission = GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission];
+        string country = GameManagerScript.Instance.Countries[GameManagerScript.Instance.CurrentCountry];
+        Mission CurrentMission = GameManagerScript.Instance.Missions[country][GameManagerScript.Instance.CurrentMission];
         Name.text = "Network Established -- Choose Their Fate";
         Description.text = CurrentMission.Description;
         Reputation_Choice.text = CurrentMission.RepChoice;
         Influence_Choice.text = CurrentMission.InfChoice;
-        Influece_Reward.text = "COST: " + CurrentMission.InfReward.ToString() + " Inf";
-        Reputation_Reward.text = "COST: " + CurrentMission.RepReward.ToString() + " Rep";
-        if (GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission].RepReward > GameManagerScript.Instance.CurrentReputation)
+        Influece_Reward.text = "COST: " + GameManagerScript.BigIntegerDisplay(CurrentMission.InfReward) + " Influence";
+        Reputation_Reward.text = "COST: " + GameManagerScript.BigIntegerDisplay(CurrentMission.RepReward) + " Reputation";
+        if (GameManagerScript.Instance.Missions[country][GameManagerScript.Instance.CurrentMission].RepReward > GameManagerScript.Instance.CurrentReputation)
         {
             RepLock.SetActive(true);
             RepButton.interactable = false;
         }
-
-        if (GameManagerScript.Instance.Missions[GameManagerScript.Instance.CurrentCountry][GameManagerScript.Instance.CurrentMission].InfReward > GameManagerScript.Instance.CurrentInfluence)
+        else
+        {
+            RepLock.SetActive(false);
+            RepButton.interactable = true;
+        }
+        if (GameManagerScript.Instance.Missions[country][GameManagerScript.Instance.CurrentMission].InfReward > GameManagerScript.Instance.CurrentInfluence)
         {
             InfLock.SetActive(true);
             InfButton.interactable = false;
+        }
+        else
+        {
+            InfLock.SetActive(false);
+            InfButton.interactable = true;
         }
         DataCost.text = "";
         InfluenceCost.text = "";

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class CategoryButton : MonoBehaviour
@@ -12,9 +13,15 @@ public class CategoryButton : MonoBehaviour
     public GameObject OtherMenu1;
     public GameObject OtherMenu2;
     public GameObject OtherMenu3;
+    public TextMeshProUGUI AnnouncementText;
+    public string MenuDescription;
+    AudioSource sound;
+    public AudioClip clip1;
+    public AudioClip clip2;
     // Start is called before the first frame update
     void Start()
     {
+        sound = this.GetComponent<AudioSource>();
         anim = this.GetComponent<Animator>();
         if (this.gameObject.name.Equals("Malware"))
         {
@@ -28,8 +35,19 @@ public class CategoryButton : MonoBehaviour
         
     }
 
+    public void TaskOnHover()
+    {
+        sound.PlayOneShot(clip2);
+        AnnouncementText.text = MenuDescription;
+    }
+    public void TaskOnUnhover()
+    {
+        
+        AnnouncementText.text = "";
+    }
     public void TaskOnClick()
     {
+        sound.PlayOneShot(clip1);
         OtherAnim1.SetBool("CategorySelected", false);
         OtherAnim2.SetBool("CategorySelected", false);
         OtherAnim3.SetBool("CategorySelected",false); 
